@@ -1,11 +1,39 @@
-version: '3.8'
+version: "3.8"
 
 services:
   frontend:
     build:
-        context: ./Frontend
-        dockerfile: Dockerfile
-    container_name: angular-frontend
+      context: ./Frontend
     ports:
       - "4200:80"
-    restart: unless-stopped
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16
+    container_name: payhub-db
+    environment:
+      POSTGRES_DB: payhub
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@payhub.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+volumes:
+  pgdata:
+  pgadmin-data:
